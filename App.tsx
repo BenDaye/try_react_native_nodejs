@@ -5,9 +5,10 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -24,6 +25,8 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+
+import nodejs from 'nodejs-mobile-react-native';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -62,6 +65,18 @@ function App(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  useEffect(() => {
+    try {
+      nodejs.start('main.js');
+
+      nodejs.channel.addListener('message', msg => {
+        console.log('Message from Node.js:', msg);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -76,6 +91,10 @@ function App(): React.JSX.Element {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
+          <Button
+            title="Message Node"
+            onPress={() => nodejs.channel.send('A message!')}
+          />
           <Section title="Step One">
             Edit <Text style={styles.highlight}>App.tsx</Text> to change this
             screen and then come back to see your edits.
